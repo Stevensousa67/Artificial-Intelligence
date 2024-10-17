@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, accuracy_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 
 # Load the Boston Housing dataset and create DataFrame
 boston = fetch_openml(name='boston', version=1)
