@@ -2,9 +2,9 @@
     Instructor: Dr. Poonam Kumari
     Course: CS470 - Intro to Artificial Intelligence
     Institution: Bridgewater State University 
-    Date: 11/07/2024
-    Description: This is a utils file for the Population Collapse project that contains shared functions and constants.
-    version: 1.0'''
+    Date: 11/09/2024
+    version: 1.0
+    Description: This is a utils file for the Population Collapse project that contains shared functions and constants.'''
 
 import pandas as pd
 
