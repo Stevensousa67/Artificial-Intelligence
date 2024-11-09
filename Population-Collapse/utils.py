@@ -8,7 +8,8 @@
 
 import pandas as pd
 
-FILE_PATH = './Population-Collapse/resources/Population History.xlsx'
+FILE_PATH = './Population-Collapse/resources/Population History.xlsx'   # Steven's file path
+# FILE_PATH = r'C:\Users\njp12\Desktop\AI Project Files\Population History.xlsx' # Nick's file path
 
 def load_data(file_path):
     '''Load the data from the specified file path.'''
