@@ -47,7 +47,7 @@ def plot_decomposition(decomposition, indicator):
 def fit_autoarima_model(train_data, test_data):
     '''Fit an ARIMA model using auto_arima to automatically select the best parameters, and make predictions on the test data.'''
 
-    model = pm.auto_arima(train_data, seasonal=True, m=12, stepwise=True, trace=True)
+    model = pm.auto_arima(train_data, seasonal=False, stepwise=True, trace=True)
     print(f"Best ARIMA model order: {model.order}")
 
     predictions = model.predict(n_periods=len(test_data))
@@ -93,8 +93,7 @@ def main():
     decomposition = seasonal_decompose(indicator_data, model='additive', period=12)
     plot_decomposition(decomposition, indicator_data)
 
-    # Split the data into training and test sets (50% split)
-    split_index = len(indicator_data) // 2
+    split_index = int(len(indicator_data) * 0.7)  # 70% train
     train_data = indicator_data[:split_index]
     test_data = indicator_data[split_index:]
 
