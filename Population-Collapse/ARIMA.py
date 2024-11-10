@@ -1,3 +1,15 @@
+''' Authors: Steven Sousa & Nicholas Pace
+    Instructor: Dr. Poonam Kumari
+    Course: CS470 - Intro to Artificial Intelligence
+    Institution: Bridgewater State University 
+    Date: 11/07/2024
+    Date: 11/08/2024
+    version: 1.0
+    Description: This is the ARIMA file for the Population Collapse project. This file has the following objectives:
+        1. Read in the data from the .xlsx file.
+        2. Perform seasonal decomposition on user selected country and indicator.
+        3. Fit an ARIMA model to the data, make predictions, and evaluate the model.'''
+
 import matplotlib.pyplot as plt
 from statsmodels.tsa.seasonal import seasonal_decompose
 from sklearn.metrics import root_mean_squared_error
