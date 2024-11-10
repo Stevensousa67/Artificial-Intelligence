@@ -27,8 +27,21 @@ def get_user_selection(options, prompt):
     print(prompt)
     for option in options:
         print(option)
-    selection = input("\nPlease enter your choice: ")
-    while selection not in options:
-        print("Invalid choice. Please choose from the list.")
+    
+    # Determine the type of the options
+    option_type = type(options[0])
+    
+    while True:
         selection = input("\nPlease enter your choice: ")
-    return selection
+        
+        # Convert the selection to the appropriate type
+        try:
+            selection = option_type(selection)
+        except ValueError:
+            print(f"Invalid choice. Please enter a valid {option_type.__name__}.")
+            continue
+        
+        if selection in options:
+            return selection
+        else:
+            print("Invalid choice. Please choose from the list.")
