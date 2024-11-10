@@ -54,10 +54,13 @@ import utils
 
 def data_summary_overview(data):
     '''Print the summary statistics and overview of the dataset.'''
+
     print('Data Overview:\n', data.head())
     print('Data Summary:\n', data.describe())
 
 def missing_data_analysis(data):
+    '''Plot a heatmap to visualize the missing data in the dataset.'''
+    
     plt.figure(figsize=(10, 6))
     sns.heatmap(data.isnull(), cmap='viridis', cbar=False)
     plt.xticks(rotation=90)
