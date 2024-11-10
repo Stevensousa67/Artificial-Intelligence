@@ -1,4 +1,4 @@
-''' Authors: Steven Sousa & Nicholas Pace
+''' Authors: Steven Sousa & Nicolas Pace
     Instructor: Dr. Poonam Kumari
     Course: CS470 - Intro to Artificial Intelligence
     Institution: Bridgewater State University 
