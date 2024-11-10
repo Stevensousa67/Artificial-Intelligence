@@ -2,7 +2,6 @@
     Instructor: Dr. Poonam Kumari
     Course: CS470 - Intro to Artificial Intelligence
     Institution: Bridgewater State University 
-    Date: 11/07/2024
     Date: 11/08/2024
     version: 1.0
     Description: This is the ARIMA file for the Population Collapse project. This file has the following objectives:
