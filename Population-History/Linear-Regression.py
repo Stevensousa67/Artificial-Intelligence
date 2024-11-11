@@ -116,7 +116,7 @@ def evaluate_model(model, x_test, y_test):
     print('R2 Score:', r2_score(y_test, y_pred))
     return y_pred
 
-def plot_results(y_test, y_pred, indicator):
+def plot_results(y_test, y_pred, indicator, selected_country):
     """Plots the actual vs predicted results."""
 
     plt.figure(figsize=(8, 6))
@@ -124,7 +124,7 @@ def plot_results(y_test, y_pred, indicator):
     plt.plot(y_test, y_test, color='blue', label="Actual")
     plt.xlabel(f"Actual {indicator}")
     plt.ylabel(f"Predicted {indicator}")
-    plt.title(f"Linear Regression Predictions for {indicator}")
+    plt.title(f"Linear Regression Predictions for {indicator} in {selected_country}")
     plt.legend()
     plt.show()
 
@@ -168,7 +168,7 @@ def main():
     y_pred = evaluate_model(model, X_test, y_test)
 
     # Plot the results
-    plot_results(y_test, y_pred, selected_indicator)
+    plot_results(y_test, y_pred, selected_indicator, selected_country)
 
 if __name__ == "__main__":
     main()
