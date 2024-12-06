@@ -92,15 +92,12 @@ def index():
                 if selected_algo == "EDA":
                     EDA.analyze(df, selected_country, selected_indicator, output_dir)
                     result = "EDA completed."
-                elif selected_algo == "ARIMA":
-                    ARIMA.analyze(df, selected_country, selected_indicator, output_dir)
-                    result = "ARIMA completed."
-                elif selected_algo == "Linear Regression":
-                    Linear_Regression.analyze(df, selected_country, selected_indicator, output_dir)
-                    result = "Linear Regression completed."
-                elif selected_algo == "K-Means Clustering":
-                    K_Means_Clustering.analyze(df, selected_country, selected_indicator, output_dir)
-                    result = "K-Means Clustering completed."
+                elif selected_algo == "arima":
+                    result = ARIMA.analyze(df, selected_country, selected_indicator)
+                elif selected_algo == "linear_regression":
+                    result = Linear_Regression.analyze(df, selected_country, selected_indicator)
+                elif selected_algo == "k_means_clustering":
+                    result = K_Means_Clustering.analyze(df, selected_country, selected_indicator)
                 else:
                     result = "Algorithm not implemented or selected."
 
@@ -109,6 +106,7 @@ def index():
                 plot_paths = [os.path.join('plots', f) for f in plot_files]
 
                 excel_files = [f for f in os.listdir(output_dir) if f.endswith('.xlsx')]
+                excel_paths = [os.path.join('plots', f) for f in excel_files]
 
                 # Read Excel files for preview
                 for excel_file in excel_files:

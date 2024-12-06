@@ -39,9 +39,12 @@ def preprocess_data(file_path):
         df = df[~df['Country Name'].str.contains('Data from database: Population estimates and projections', na=False)]
         df = df[~df['Country Name'].str.contains('Last Updated: ', na=False)]
 
+<<<<<<< HEAD
         # Convert Time to numeric
         df['Time'] = pd.to_numeric(df['Time'], errors='coerce')  # Convert 'Time' to numeric, invalid values become NaN
 
+=======
+>>>>>>> c5601799fb62353738330b72ecbd7d9165a91eb4
         # Save the cleaned data to a new file in .xlsx format and in the same location as the original file.
         cleaned_file_path = file_path.replace('.xlsx', '_cleaned.xlsx')
         df.to_excel(cleaned_file_path, index=False)
