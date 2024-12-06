@@ -64,8 +64,8 @@ def preprocess_data(df, correlation_threshold=0.8):
 
     return df
 
-def select_features(df, selected_indicator, threshold=0.3):
-    """Selects features based on correlation with the target variable."""
+def select_features(df, selected_indicator, threshold=0.9):
+    """Selects features based on a higher correlation threshold with the target variable."""
     
     # Select only numeric columns
     numeric_df = df.select_dtypes(include=np.number)
@@ -130,43 +130,32 @@ def plot_results(y_test, y_pred, indicator, selected_country):
 
 def main():
     """Main function to run the linear regression analysis."""
-
     # Load the data
     population_data = utils.load_data(utils.FILE_PATH)
     if population_data is None:
         return
-
     # Preprocess the data
     population_data = preprocess_data(population_data)
-
     # Select the indicator to predict
     indicators = population_data.columns.drop(['Country', 'Time'])
     selected_indicator = utils.get_user_selection(indicators, "Select indicator to predict:")
-
     # Select the country or all countries
     unique_countries = population_data['Country'].unique()
     selected_country = utils.get_user_selection(unique_countries, "Select country (or type 'All' for all countries):")
-
-    # Select features based on correlation with the target variable
-    selected_features = select_features(population_data, selected_indicator, threshold=0.3)
+    # Select features based on a higher correlation threshold with the target variable
+    selected_features = select_features(population_data, selected_indicator, threshold=0.9)
     print("Selected Features:", selected_features)
-
     # Filter data for the selected country or use all countries
     if selected_country.lower() != 'all':
         population_data = population_data[population_data['Country'] == selected_country]
-
     # Prepare the data for modeling
     X, y = prepare_data(population_data, selected_indicator, selected_features)
-
     # Split the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-
     # Train the model
     model = train_model(X_train, y_train)
-
     # Evaluate the model
     y_pred = evaluate_model(model, X_test, y_test)
-
     # Plot the results
     plot_results(y_test, y_pred, selected_indicator, selected_country)
 
