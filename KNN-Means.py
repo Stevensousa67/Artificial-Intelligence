@@ -8,7 +8,6 @@ from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
 if __name__ == '__main__':
     # Load the California Housing dataset and create DataFrame
     california_housing = fetch_california_housing()
