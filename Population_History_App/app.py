@@ -77,6 +77,9 @@ def index():
                     return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error=str(e))
 
         elif 'analyze' in request.form:
+            selected_algo = request.form.get('algorithm', '')  # Retrieve the selected algorithm from the form
+            print(f"Selected algorithm: {selected_algo}")  # Print the selected algorithm to verify
+
             cleaned_file_path = session.get('cleaned_file_path', '')
 
             if cleaned_file_path.endswith('.csv'):
@@ -92,12 +95,12 @@ def index():
                 if selected_algo == "EDA":
                     EDA.analyze(df, selected_country, selected_indicator, output_dir)
                     result = "EDA completed."
-                elif selected_algo == "arima":
-                    result = ARIMA.analyze(df, selected_country, selected_indicator)
-                elif selected_algo == "linear_regression":
-                    result = Linear_Regression.analyze(df, selected_country, selected_indicator)
-                elif selected_algo == "k_means_clustering":
-                    result = K_Means_Clustering.analyze(df, selected_country, selected_indicator)
+                elif selected_algo == "ARIMA":
+                    result = ARIMA.analyze(df, selected_country, selected_indicator, output_dir)
+                elif selected_algo == "Linear Regression":
+                    result = Linear_Regression.analyze(df, selected_country, selected_indicator, output_dir)
+                elif selected_algo == "K-Means Clustering":
+                    result = K_Means_Clustering.analyze(df, selected_country, selected_indicator, output_dir)
                 else:
                     result = "Algorithm not implemented or selected."
 
