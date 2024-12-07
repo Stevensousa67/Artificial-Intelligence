@@ -15,7 +15,8 @@ from sklearn.metrics import root_mean_squared_error
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import matplotlib.pyplot as plt
 import pandas as pd
-import os
+import os, matplotlib
+matplotlib.use('Agg')
 
 def plot_acf_pacf(data, lags=None):
     '''Plot ACF and PACF dynamically based on dataset size.'''
