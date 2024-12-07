@@ -22,19 +22,6 @@ import pandas as pd
 import os
 matplotlib.use('Agg')
 
-''' Authors: Steven Sousa & Nicolas Pace
-    Instructor: Dr. Poonam Kumari
-    Course: CS470 - Intro to Artificial Intelligence
-    Institution: Bridgewater State University 
-    Date: 11/09/2024
-    version: 1.0
-    Description: This is the Linear Regression file for the Population History project. This file has the following objectives:
-        1. Read in the data from the .xlsx file.
-        2. Preprocess the data to handle correlated features and create new features.
-        3. Select features based on correlation with the target variable.
-        4. Prepare the data for modeling and train a linear regression model.
-        5. Evaluate the model and plot the results.'''
-
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
