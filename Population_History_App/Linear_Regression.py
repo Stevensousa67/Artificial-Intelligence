@@ -98,7 +98,7 @@ def analyze(df, selected_country, selected_indicator, output_dir):
     """Main function to run the linear regression analysis."""
 
     # Select features based on a higher correlation threshold with the target variable
-    selected_features = select_features(df, selected_indicator, threshold=0.9)
+    selected_features = select_features(df, selected_indicator[0], threshold=0.9)
     print("Selected Features:", selected_features)
     # Filter data for the selected country or use all countries
     df = df[df['Country Name'] == selected_country]

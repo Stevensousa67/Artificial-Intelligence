@@ -32,7 +32,7 @@ def index():
     countries = session.get('countries', [])
     indicators = session.get('indicators', [])
     selected_country = request.form.get('country', '')
-    selected_indicator = request.form.get('indicator', '')
+    selected_indicator = request.form.getlist('indicator')
 
     excel_previews = []
 
@@ -96,11 +96,17 @@ def index():
                     EDA.analyze(df, selected_country, selected_indicator, output_dir)
                     result = "EDA completed."
                 elif selected_algo == "ARIMA":
-                    result = ARIMA.analyze(df, selected_country, selected_indicator, output_dir)
+                    ARIMA.analyze(df, selected_country, selected_indicator, output_dir)
+                    result = "ARIMA completed."
                 elif selected_algo == "Linear Regression":
-                    result = Linear_Regression.analyze(df, selected_country, selected_indicator, output_dir)
+                    Linear_Regression.analyze(df, selected_country, selected_indicator, output_dir)
+                    result = "Linear Regression completed."
                 elif selected_algo == "K-Means Clustering":
-                    result = K_Means_Clustering.analyze(df, selected_country, selected_indicator, output_dir)
+                    # Ensure at least two indicators are selected for K-Means Clustering
+                    if len(selected_indicator) < 2:
+                        return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error="Please select at least two indicators for K-Means Clustering.")
+                    K_Means_Clustering.analyze(df, selected_country, selected_indicator, output_dir)
+                    result = "K-Means Clustering completed."
                 else:
                     result = "Algorithm not implemented or selected."
 
@@ -109,7 +115,6 @@ def index():
                 plot_paths = [os.path.join('plots', f) for f in plot_files]
 
                 excel_files = [f for f in os.listdir(output_dir) if f.endswith('.xlsx')]
-                excel_paths = [os.path.join('plots', f) for f in excel_files]
 
                 # Read Excel files for preview
                 for excel_file in excel_files:

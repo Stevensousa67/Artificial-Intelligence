@@ -138,6 +138,6 @@ def analyze(df, selected_country, selected_indicator, output_dir):
     data_summary_overview(df, output_dir)
     missing_data_analysis(df, output_dir)
     correlation_analysis(df, output_dir)
-    time_series_analysis(df, selected_country, [selected_indicator], output_dir)
-    distribution_analysis(df, selected_country, {selected_indicator: selected_indicator}, output_dir)
+    time_series_analysis(df, selected_country, [selected_indicator[0]], output_dir)
+    distribution_analysis(df, selected_country, {selected_indicator[0]: selected_indicator[0]}, output_dir)
     return "EDA completed."

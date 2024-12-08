@@ -13,7 +13,9 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import os, matplotlib
 import pandas as pd
+
 matplotlib.use('Agg')
+
 
 def preprocess_data(population_data):
     '''Preprocess the data by handling missing values and scaling the features.'''
@@ -23,8 +25,13 @@ def preprocess_data(population_data):
     population_data[numeric_columns] = population_data[numeric_columns].fillna(population_data[numeric_columns].mean())
     return population_data
 
+
 def perform_kmeans_clustering(population_data, features, k=3):
     '''Perform K-Means clustering on the data using the specified features and number of clusters.'''
+
+    # Ensure features is a list
+    if isinstance(features, str):
+        features = [features]
 
     # Select relevant features for clustering
     X = population_data[features]
@@ -32,6 +39,11 @@ def perform_kmeans_clustering(population_data, features, k=3):
     # Standardize the features
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
+
+    # Check if X_scaled has at least two dimensions
+    if X_scaled.shape[1] < 2:
+        raise ValueError(f"The selected indicators must result in at least two dimensions. "
+                         f"Currently selected features: {features}")
 
     # Fit the K-Means model
     kmeans = KMeans(n_clusters=k, random_state=42)  # Set random_state for reproducibility
@@ -42,31 +54,45 @@ def perform_kmeans_clustering(population_data, features, k=3):
 
     return population_data, X_scaled, kmeans
 
-def visualize_clusters(X_scaled, kmeans, output_dir):
+def visualize_clusters(X_scaled, kmeans, output_dir, selected_country, selected_indicators):
     '''Visualize the clusters using a scatter plot of the scaled features.'''
 
     plt.figure(figsize=(8, 6))
-    plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=kmeans.labels_, cmap='viridis')
 
-    # Gotta change this so that it dynamically changes based on the selected indicators and country.
-    plt.xlabel("Age Dependency Ratio (Scaled)")
-    plt.ylabel("Fertility Rate (Scaled)")
-    plt.title("K-Means Clustering of Countries")
+    # Check if X_scaled has at least two dimensions
+    if X_scaled.shape[1] < 2:
+        raise ValueError("The selected indicators must result in at least two dimensions for visualization.")
+
+    print(f"Shape of X_scaled in visualize_clusters: {X_scaled.shape}")  # Debug statement
+
+    # Create a mapping of cluster numbers to indicator names
+    cluster_labels = [f'{selected_indicators[0]} vs {selected_indicators[1]}' for _ in range(kmeans.n_clusters)]
+
+    # Plot each cluster with a different color and label
+    for cluster in range(kmeans.n_clusters):
+        plt.scatter(X_scaled[kmeans.labels_ == cluster, 0], X_scaled[kmeans.labels_ == cluster, 1], 
+                    label=cluster_labels[cluster], cmap='viridis')
+
+    plt.xlabel(f"{selected_indicators[0]} (Scaled)")
+    plt.ylabel(f"{selected_indicators[1]} (Scaled)")
+    plt.title(f"K-Means Clustering of {selected_country}")
+    plt.legend()  # Add legend to the plot
 
     # Save the plot to a file
     plt.savefig(os.path.join(output_dir, f'k_means_clustering.png'))
     plt.close()
 
+
 def analyze_clusters(population_data, k, output_dir):
     '''Analyze the clusters by exporting summary statistics for each cluster to a single Excel sheet.'''
     analysis_path = os.path.join(output_dir, 'cluster_analysis.xlsx')
-    
+
     all_summary_stats = []
 
     for i in range(k):
         cluster_data = population_data[population_data["Cluster"] == i]
         print(f"Cluster {i}:")
-        summary_stats = cluster_data[["Country", "Age dependency ratio (% of working-age population)", "Fertility rate, total (births per woman)"]].describe()
+        summary_stats = cluster_data.describe()
         summary_stats['Cluster'] = i  # Add a column to indicate the cluster number
         all_summary_stats.append(summary_stats)
         print(summary_stats)
@@ -81,17 +107,22 @@ def analyze_clusters(population_data, k, output_dir):
 
     print(f"Cluster analysis exported to {analysis_path}")
 
+
 def analyze(df, selected_country, selected_indicator, output_dir):
     '''Main function to perform K-Means clustering on the population data.'''
+
+    # Ensure there are at least two indicators
+    if len(selected_indicator) < 2:
+        all_numeric_columns = df.select_dtypes(include=['number']).columns.tolist()
+        remaining_features = [col for col in all_numeric_columns if col not in selected_indicator]
+        if remaining_features:
+            selected_indicator.append(remaining_features[0])
+        else:
+            raise ValueError("Not enough numeric features available for clustering. " f"Available features: {all_numeric_columns}")
+
     df = preprocess_data(df)
+    k = len(selected_indicator)  # Use the number of selected indicators as the number of clusters
+    df, X_scaled, kmeans = perform_kmeans_clustering(df,selected_indicator, k)
 
-    # Gotta change this to allow for user input. Thinking about altering the Analyze form in upload.html
-    # so that it displays extra choices when the user chooses K-Means Clustering algorithm.
-    # Pass the selected indicators and country to the function. If you want to great creative,
-    # you can allow the user to choose the k-value.
-    features = ["Age dependency ratio (% of working-age population)", "Fertility rate, total (births per woman)"]
-    k = 3
-
-    df, X_scaled, kmeans = perform_kmeans_clustering(df, features, k)
-    visualize_clusters(X_scaled, kmeans, output_dir)
+    visualize_clusters(X_scaled, kmeans, output_dir, selected_country, selected_indicator)
     analyze_clusters(df, k, output_dir)

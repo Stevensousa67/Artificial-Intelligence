@@ -127,22 +127,22 @@ def analyze(df, selected_country, selected_indicator, output_dir):
     '''Main function for ARIMA modeling and forecasting.'''
     # Filter data for the selected country and indicator
     country_data = df[df['Country Name'] == selected_country]
-    time_series = country_data[['Time', selected_indicator]].set_index('Time')
+    time_series = country_data[['Time', selected_indicator[0]]].set_index('Time')
     time_series.index = pd.to_datetime(time_series.index, format='%Y').to_period('Y').to_timestamp()
 
     # Decompose time series (only if there are enough data points)
     if len(time_series) >= 2:
         try:
-            decomposition = seasonal_decompose(time_series[selected_indicator], model='additive', period=1)
-            plot_decomposition(decomposition, time_series[selected_indicator], output_dir)
+            decomposition = seasonal_decompose(time_series[selected_indicator[0]], model='additive', period=1)
+            plot_decomposition(decomposition, time_series[selected_indicator[0]], output_dir)
         except ValueError as e:
             print(f"Decomposition failed: {e}")
     else:
         print("Insufficient data for decomposition.")
 
     # Split data into 80/20 for training and testing
-    train_data = time_series[selected_indicator].iloc[:int(len(time_series) * 0.8)]
-    test_data = time_series[selected_indicator].iloc[int(len(time_series) * 0.8):]
+    train_data = time_series[selected_indicator[0]].iloc[:int(len(time_series) * 0.8)]
+    test_data = time_series[selected_indicator[0]].iloc[int(len(time_series) * 0.8):]
 
     # Set forecast period (e.g., 10 years)
     forecast_periods = 10
@@ -150,4 +150,4 @@ def analyze(df, selected_country, selected_indicator, output_dir):
     print(f"Final Model Order: {best_order}")
     
     # Plot forecast results
-    plot_forecast(train_data, test_data, predictions, forecast, selected_country, selected_indicator, forecast_periods, output_dir)
+    plot_forecast(train_data, test_data, predictions, forecast, selected_country, selected_indicator[0], forecast_periods, output_dir)
