@@ -11,6 +11,31 @@
             document.getElementById('uploadForm').style.display = 'none';
             document.getElementById('analyzeForm').style.display = 'block';
         }
+
+        function toggleIndicatorSelection() {
+            const algo = document.getElementById('algorithm').value;
+            const indicator = document.getElementById('indicator');
+            if (algo === "K-Means Clustering") {
+                indicator.setAttribute('multiple', 'multiple');
+                indicator.setAttribute('size', '5'); // Adjust size to show more options at once
+            } else {
+                indicator.removeAttribute('multiple');
+                indicator.removeAttribute('size');
+            }
+        }
+
+        function validateForm(event) {
+            const algo = document.getElementById('algorithm').value;
+            const indicator = document.getElementById('indicator');
+            if (algo === "K-Means Clustering") {
+                const selectedOptions = Array.from(indicator.selectedOptions);
+                if (selectedOptions.length < 2) {
+                    alert("Please select at least two indicators for K-Means Clustering.");
+                    event.preventDefault(); // Prevent form submission
+                }
+            }
+        }
+
     </script>
 </head>
 
@@ -20,7 +45,6 @@
             <div class="col-md-6">
                 <h1 class="text-center mb-5">Population History</h1>
                 <form id="uploadForm" method="POST" enctype="multipart/form-data" onsubmit="hideUploadForm()" style="display: {% if preprocessed %}none{% else %}block{% endif %};">
-                    <!-- Important: enctype for file upload -->
                     <div class="mb-3">
                         <label for="file" class="form-label fw-bold">Upload World Bank's Population Estimates & Projections Dataset.</label>
                         <p class="text-muted">Supported file formats: .csv, .xlsx. </p>
@@ -41,10 +65,10 @@
         <div class="row justify-content-center mt-5">
             <div class="col-md-6">
                 <h1 class="text-center mb-5">Analyze Data</h1>
-                <form method="POST">
+                <form method="POST" onsubmit="validateForm(event)">
                     <div class="mb-3">
                         <label for="algorithm" class="form-label">Select Algorithm:</label>
-                        <select class="form-select" id="algorithm" name="algorithm" required>
+                        <select class="form-select" id="algorithm" name="algorithm" onchange="toggleIndicatorSelection()" required>
                             <option value="">Select an Algorithm</option>
                             {% for algo in algorithms %}
                             <option value="{{ algo }}" {% if selected_algo==algo %}selected{% endif %}>{{ algo }}</option>
@@ -56,7 +80,7 @@
                         <select class="form-select" id="country" name="country" required>
                             <option value="">Select a Country</option>
                             {% for country in countries %}
-                            <option value="{{ country }}" {% if selected_country==country %}selected{% endif %}>{{ country }}</option>
+                            <option value="{{ country }}" {% if selected_country==country %}selected{% endif %}>{{country }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -97,13 +121,14 @@
             </div>
         </div>
         {% endif %}
-        
+
         {% if plot_paths %}
         <div class="row justify-content-center mt-5">
             <div class="col-12">
                 <h3 class="text-center">Generated Plots</h3>
                 {% for plot_path in plot_paths %}
-                <img src="{{ url_for('uploaded_file', filename=plot_path.split('/')[-1]) }}" class="img-fluid mt-2" alt="Generated Plot">
+                <img src="{{ url_for('uploaded_file', filename=plot_path.split('/')[-1]) }}" class="img-fluid mt-2"
+                    alt="Generated Plot">
                 {% endfor %}
             </div>
         </div>
