@@ -1,9 +1,6 @@
 from flask import Flask, render_template, request, session, send_from_directory
 import pandas as pd
 import os, ARIMA, EDA, K_Means_Clustering, Linear_Regression, preprocessing
-import io
-import base64
-import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # Needed for session management
