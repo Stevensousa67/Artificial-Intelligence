@@ -65,8 +65,8 @@ def visualize_clusters(X_scaled, kmeans, output_dir, selected_country, selected_
 
     print(f"Shape of X_scaled in visualize_clusters: {X_scaled.shape}")  # Debug statement
 
-    # Create a mapping of cluster numbers to indicator names
-    cluster_labels = [f'{selected_indicators[0]} vs {selected_indicators[1]}' for _ in range(kmeans.n_clusters)]
+    # Create a list of unique labels for each cluster
+    cluster_labels = [f'{selected_indicators[i]}' for i in range(kmeans.n_clusters)]
 
     # Plot each cluster with a different color and label
     for cluster in range(kmeans.n_clusters):
@@ -93,7 +93,13 @@ def analyze_clusters(population_data, k, output_dir):
         cluster_data = population_data[population_data["Cluster"] == i]
         print(f"Cluster {i}:")
         summary_stats = cluster_data.describe()
-        summary_stats['Cluster'] = i  # Add a column to indicate the cluster number
+
+        # Reset the index and rename the index column
+        summary_stats = summary_stats.reset_index()
+        summary_stats.rename(columns={'index': 'Statistic'}, inplace=True)
+
+        # Add a column to indicate the cluster number
+        summary_stats['Cluster'] = i
         all_summary_stats.append(summary_stats)
         print(summary_stats)
         print()
@@ -103,7 +109,7 @@ def analyze_clusters(population_data, k, output_dir):
 
     # Write the combined summary statistics to a single sheet in the Excel file
     with pd.ExcelWriter(analysis_path) as writer:
-        combined_summary_stats.to_excel(writer, sheet_name='Cluster_Analysis')
+        combined_summary_stats.to_excel(writer, index=False, sheet_name='Cluster_Analysis')
 
     print(f"Cluster analysis exported to {analysis_path}")
 
