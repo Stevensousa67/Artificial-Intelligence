@@ -1,7 +1,26 @@
+''' Authors: Steven Sousa & Nicolas Pace
+    Instructor: Dr. Poonam Kumari
+    Course: CS470 - Intro to Artificial Intelligence
+    Institution: Bridgewater State University
+    Date: 11/09/2024
+    version: 1.0
+    Description: This is the main application file for the Population History project. This file has the following objectives:
+        1. Implement a web application using Flask for uploading and analyzing population data.
+        2. Provide functionality for preprocessing data, selecting algorithms, and displaying results.
+        3. Integrate the implemented algorithms for Exploratory Data Analysis, Linear Regression, K-Means Clustering, and ARIMA.
+        4. Enable users to upload population data files in CSV or Excel format.
+        5. Display plots and analysis results based on the selected algorithm and data.
+        6. Handle errors and exceptions during the data analysis process.
+        7. Ensure session management for storing data between requests.
+        8. Implement file upload and download functionality for data files and analysis results.
+        9. Provide a user-friendly interface for interacting with the application.
+        '''
+
 from flask import Flask, render_template, request, session, send_from_directory
 import pandas as pd
 import os, ARIMA, EDA, K_Means_Clustering, Linear_Regression, preprocessing
 
+# Initialize the Flask application
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # Needed for session management
 
@@ -14,15 +33,43 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PLOT_FOLDER'] = PLOT_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = {'csv', 'xlsx'}
 
+
 def allowed_file(filename):
+    """
+    Check if the uploaded file is allowed based on its extension.
+
+    Args:
+        filename (str): The name of the file to check.
+
+    Returns:
+        bool: True if the file is allowed, False otherwise.
+    """
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
 
 @app.route('/uploads/plots/<filename>')
 def uploaded_file(filename):
+    """
+    Serve the uploaded plot file.
+
+    Args:
+        filename (str): The name of the file to serve.
+
+    Returns:
+        Response: The file to be sent to the client.
+    """
     return send_from_directory(app.config['PLOT_FOLDER'], filename)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    """
+    Handle the main route for the web application. This route allows users to upload files,
+    preprocess data, select algorithms, and display analysis results.
+
+    Returns:
+        Response: The rendered HTML template for the main page.
+    """
     result = None
     algorithms = ['EDA', 'Linear Regression', 'K-Means Clustering', 'ARIMA']
     selected_algo = request.form.get('algorithm', '')
@@ -36,11 +83,15 @@ def index():
     if request.method == 'POST':
         if 'preprocess' in request.form:
             if 'file' not in request.files:
-                return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error="No file part")
+                return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo,
+                                       countries=countries, indicators=indicators, selected_country=selected_country,
+                                       selected_indicator=selected_indicator, error="No file part")
 
             file = request.files['file']
             if file.filename == '':
-                return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error="No selected file")
+                return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo,
+                                       countries=countries, indicators=indicators, selected_country=selected_country,
+                                       selected_indicator=selected_indicator, error="No selected file")
 
             if file and allowed_file(file.filename):
                 filename = file.filename
@@ -50,14 +101,20 @@ def index():
                 try:
                     cleaned_file_path = preprocessing.preprocess_data(filepath)
                     if isinstance(cleaned_file_path, str) and "Error" in cleaned_file_path:
-                        return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error=cleaned_file_path)
+                        return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo,
+                                               countries=countries, indicators=indicators,
+                                               selected_country=selected_country, selected_indicator=selected_indicator,
+                                               error=cleaned_file_path)
 
                     if cleaned_file_path.endswith('.csv'):
                         df = pd.read_csv(cleaned_file_path)
                     elif cleaned_file_path.endswith('.xlsx'):
                         df = pd.read_excel(cleaned_file_path)
                     else:
-                        return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error="Unexpected error after preprocessing.")
+                        return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo,
+                                               countries=countries, indicators=indicators,
+                                               selected_country=selected_country, selected_indicator=selected_indicator,
+                                               error="Unexpected error after preprocessing.")
 
                     # Extract unique countries and indicators from the dataset
                     if 'Country Name' in df.columns:
@@ -68,10 +125,16 @@ def index():
                         session['cleaned_file_path'] = cleaned_file_path
                         session['preprocessed'] = True  # Set flag to indicate preprocessing is complete
                     else:
-                        return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error="Country column not found in dataset.")
+                        return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo,
+                                               countries=countries, indicators=indicators,
+                                               selected_country=selected_country, selected_indicator=selected_indicator,
+                                               error="Country column not found in dataset.")
 
                 except Exception as e:
-                    return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error=str(e))
+                    return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo,
+                                           countries=countries, indicators=indicators,
+                                           selected_country=selected_country, selected_indicator=selected_indicator,
+                                           error=str(e))
 
         elif 'analyze' in request.form:
             selected_algo = request.form.get('algorithm', '')  # Retrieve the selected algorithm from the form
@@ -84,7 +147,10 @@ def index():
             elif cleaned_file_path.endswith('.xlsx'):
                 df = pd.read_excel(cleaned_file_path)
             else:
-                return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error="Unexpected error after preprocessing.")
+                return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo,
+                                       countries=countries, indicators=indicators, selected_country=selected_country,
+                                       selected_indicator=selected_indicator,
+                                       error="Unexpected error after preprocessing.")
 
             output_dir = app.config['PLOT_FOLDER']
 
@@ -101,7 +167,10 @@ def index():
                 elif selected_algo == "K-Means Clustering":
                     # Ensure at least two indicators are selected for K-Means Clustering
                     if len(selected_indicator) < 2:
-                        return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error="Please select at least two indicators for K-Means Clustering.")
+                        return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo,
+                                               countries=countries, indicators=indicators,
+                                               selected_country=selected_country, selected_indicator=selected_indicator,
+                                               error="Please select at least two indicators for K-Means Clustering.")
                     K_Means_Clustering.analyze(df, selected_country, selected_indicator, output_dir)
                     result = "K-Means Clustering completed."
                 else:
@@ -124,13 +193,21 @@ def index():
                             'data': sheet_data.head().to_html(classes='table table-bordered')
                         })
 
-                return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, result=result, plot_paths=plot_paths, excel_previews=excel_previews)
+                return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo,
+                                       countries=countries, indicators=indicators, selected_country=selected_country,
+                                       selected_indicator=selected_indicator, result=result, plot_paths=plot_paths,
+                                       excel_previews=excel_previews)
 
             except Exception as e:
-                return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, error=str(e))
+                return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo,
+                                       countries=countries, indicators=indicators, selected_country=selected_country,
+                                       selected_indicator=selected_indicator, error=str(e))
 
     preprocessed = session.get('preprocessed', False)
-    return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries, indicators=indicators, selected_country=selected_country, selected_indicator=selected_indicator, preprocessed=preprocessed)
+    return render_template("upload.html", algorithms=algorithms, selected_algo=selected_algo, countries=countries,
+                           indicators=indicators, selected_country=selected_country,
+                           selected_indicator=selected_indicator, preprocessed=preprocessed)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
