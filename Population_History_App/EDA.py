@@ -66,7 +66,9 @@ def data_summary_overview(data, output_dir):
     with pd.ExcelWriter(overview_path) as writer:
         data.head().to_excel(writer, index=False, sheet_name='Overview')
     with pd.ExcelWriter(summary_path) as writer:
-        data.describe().to_excel(writer, index=False, sheet_name='Summary')
+        summary_stats = data.describe().reset_index()
+        summary_stats.rename(columns={'index': 'Statistics'}, inplace=True)
+        summary_stats.to_excel(writer, index=False, sheet_name='Summary')
 
 def missing_data_analysis(data, output_dir):
     '''Plot a heatmap to visualize the missing data in the dataset and save the plot.'''
